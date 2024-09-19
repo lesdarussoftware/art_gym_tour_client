@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  max-width: 2000px;
+}
+
+.fullscreen-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to right, #88D9FC, #1DFDF4);
+  color: white;
+  font-size: 3rem;
+  z-index: 9999;
+  gap: 20px;
+}
+
+.fullscreen-container h3 {
+  margin-bottom: 0;
+}
+
+.score-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.score-card {
+  margin: 20px;
+  padding: 20px;
+  background-color: #333;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.score-card.total-card {
+  width: 30%;
+}
+
+@media (min-width: 2001px) {
+
+  body {
+    margin: 0 auto !important;
+  }
+}
