@@ -3,21 +3,27 @@ import { useContext, useState } from "react";
 import { format } from "date-fns";
 
 import { MessageContext } from "../providers/MessageProvider";
+import { useQuery } from "./useQuery";
 
-import { Participant } from "../server/db";
-import { ParticipantService } from "../server/participants";
 import { getParticipantAge, getParticipantCategory } from "../helpers/utils";
+import { PARTICIPANT_URL } from "../helpers/urls";
+import { STATUS_CODES } from "../helpers/constants";
+import { Participant } from "../helpers/types";
 
 export function useParticipants() {
 
     const { setSeverity, setMessage, setOpenMessage } = useContext(MessageContext);
 
+    const { handleQuery } = useQuery()
+
     const [participants, setParticipants] = useState<Participant[]>([]);
     const [action, setAction] = useState<null | 'NEW' | 'EDIT' | 'DELETE'>(null);
 
     async function getParticipants(): Promise<void> {
-        const data = await ParticipantService.findAll();
-        setParticipants(data);
+        const { status, data } = await handleQuery({ url: PARTICIPANT_URL });
+        if (status === STATUS_CODES.OK) {
+            setParticipants(data);
+        }
     }
 
     async function handleSubmit(
@@ -26,53 +32,57 @@ export function useParticipants() {
         validate: () => any,
         reset: () => void,
         setDisabled: (arg0: boolean) => void,
-        action: null | 'NEW' | 'EDIT' | 'DELETE',
+        action: 'NEW' | 'EDIT',
         setAction: (arg0: null) => void
     ) {
         e.preventDefault();
-        if (!validate()) return;
-        try {
-            if (action === 'NEW') {
-                const id: number = await ParticipantService.create({ ...formData, id: undefined });
-                setParticipants(prevParticipants => [...prevParticipants, { id, ...formData }]);
-                setMessage('Participante registrado correctamente.');
-            }
-            if (action === 'EDIT') {
-                await ParticipantService.update(formData);
-                const id: number = formData.id!;
-                setParticipants(prevParticipants => [...prevParticipants.filter(p => p.id !== id), formData]);
-                setMessage('Participante editado correctamente.');
-            }
-            reset();
-            setSeverity('success');
-            setAction(null);
-        } catch (e) {
-            setSeverity('error');
-            if (e instanceof Error) {
-                setMessage(`Ocurrió un error: ${e.message}`);
+        if (validate()) {
+            const urls = { 'NEW': PARTICIPANT_URL, 'EDIT': `${PARTICIPANT_URL}/${formData.id}` }
+            const { status, data } = await handleQuery({
+                url: urls[action],
+                method: action === 'NEW' ? 'POST' : action === 'EDIT' ? 'PUT' : 'GET',
+                body: formData
+            })
+            if (status === STATUS_CODES.CREATED) {
+                setParticipants(data)
+                setMessage('Participante registrado correctamente.')
+            } else if (status === STATUS_CODES.OK) {
+                setParticipants([data, ...participants.filter(p => p.id !== data.id)])
+                setMessage('Participante editado correctamente.')
             } else {
-                setMessage('Ocurrió un error inesperado.');
+                setMessage(data.message)
+                setSeverity('error')
+                setDisabled(false)
             }
+            if (status === STATUS_CODES.CREATED || status === STATUS_CODES.OK) {
+                setSeverity('success')
+                reset()
+                setAction(null)
+            }
+            setOpenMessage(true)
         }
-        setDisabled(false);
-        setOpenMessage(true);
     }
 
-    async function destroy(id: number, reset: () => void, setAction: (arg0: null) => void): Promise<void> {
-        try {
-            await ParticipantService.destroy(id);
-            setParticipants(prev => [...prev.filter(p => p.id !== id)]);
+    async function destroy(
+        id: number,
+        setAction: (arg0: null) => void,
+        reset: () => void,
+        setDisabled: (arg0: boolean) => void
+    ): Promise<void> {
+        const { status, data } = await handleQuery({
+            url: `${PARTICIPANT_URL}/${id}`,
+            method: 'DELETE'
+        })
+        if (status === STATUS_CODES.OK) {
+            setParticipants(prev => [...prev.filter(p => p.id !== data.id)]);
             setMessage('Participante eliminado correctamente.');
             setSeverity('success');
             setAction(null);
             reset();
-        } catch (e) {
-            setSeverity('error');
-            if (e instanceof Error) {
-                setMessage(`Ocurrió un error: ${e.message}`);
-            } else {
-                setMessage('Ocurrió un error inesperado.');
-            }
+        } else {
+            setMessage(data.message)
+            setSeverity('error')
+            setDisabled(false)
         }
         setOpenMessage(true);
     }
@@ -155,7 +165,7 @@ export function useParticipants() {
             numeric: false,
             disablePadding: true,
             label: 'Gym / Esc.',
-            sorter: (row: Participant) => row.institution_name,
+            sorter: (row: Participant) => row.institution,
             accessor: 'institution_name'
         },
         {
