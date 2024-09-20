@@ -151,7 +151,7 @@ export function Events() {
                         type="button"
                         variant="contained"
                         sx={{ color: '#fff', px: 2 }}
-                        onClick={() => destroy(eventFormData.formData.id, eventFormData.reset, setAction)}
+                        onClick={() => destroy(eventFormData.formData.id, setAction, eventFormData.reset,)}
                     >
                         Eliminar
                     </Button>

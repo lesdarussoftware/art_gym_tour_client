@@ -14,7 +14,7 @@ import { AbmEventParticipants } from '../AbmEventParticipants';
 import { ScorePresentation } from '../ScorePresentation';
 
 import { a11yProps, getAllowedParticipants } from '../../helpers/utils';
-import { EventParticipant } from '../../server/db';
+import { EventParticipant } from '../../helpers/types';
 
 export function TabsComponent({
     level,
@@ -73,7 +73,7 @@ export function TabsComponent({
         if (formData.participant_id.toString().length > 0) {
             setFormData({
                 ...formData,
-                participant_institution_name: participants.find(p => p.id === formData.participant_id)?.institution_name
+                participant_institution_name: participants.find(p => p.id === formData.participant_id)?.institution
             })
         }
     }, [formData.participant_id])
@@ -101,7 +101,7 @@ export function TabsComponent({
             </Box>
             {categories.map((cat, idx) => {
                 const allowed = getAllowedParticipants(participants, gender, level, cat);
-                const allowedIds = allowed.map(a => a.id)
+                const allowedIds = allowed.map((a: { id: any; }) => a.id)
                 return (
                     <CustomTabPanel key={idx} value={value} index={idx}>
                         <DataGrid

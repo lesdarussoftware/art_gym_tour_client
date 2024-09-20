@@ -3,38 +3,42 @@ import { useContext, useMemo, useState } from "react";
 
 import { MessageContext } from "../providers/MessageProvider";
 
-import { EventParticipant, NoteGaf, NoteGam, Participant } from "../server/db";
-import { EventParticipantService } from "../server/event-participants";
-import { ParticipantService } from "../server/participants";
+import { useQuery } from "./useQuery";
 
+import { Participant, EventParticipant, NoteGaf, NoteGam } from "../helpers/types";
 import { getTotalGaf, getTotalGam } from "../helpers/utils";
-import { NotesService } from "../server/notes";
+import { PARTICIPANT_URL, NOTE_GAF__URL, NOTE_GAM_URL, EVENT_PARTICIPANT_URL } from "../helpers/urls";
+import { STATUS_CODES } from "../helpers/constants";
 
 export function useEventParticipants() {
 
     const { setSeverity, setMessage, setOpenMessage } = useContext(MessageContext);
+
+    const { handleQuery } = useQuery()
 
     const [participants, setParticipants] = useState<Participant[]>([]);
     const [eventParticipants, setEventParticipants] = useState<EventParticipant[]>([]);
     const [action, setAction] = useState<null | 'NEW' | 'EDIT' | 'DELETE'>(null);
 
     async function getAll(event_id: number): Promise<void> {
-        const dataParticipants = await ParticipantService.findAll();
+        const { data: dataParticipants } = await handleQuery({ url: PARTICIPANT_URL });
         setParticipants(dataParticipants);
-        const notesGaf = await NotesService.findAllGaf();
-        const notesGam = await NotesService.findAllGam();
-        const data = await EventParticipantService.findAll(event_id);
-        setEventParticipants(data.map(ep => {
-            const participant = dataParticipants.find(p => p.id === ep.participant_id)!;
-            let notes;
-            if (participant.gender === 'F') {
-                notes = notesGaf.find(n => n.event_participant_id === ep.id);
-            }
-            if (participant.gender === 'M') {
-                notes = notesGam.find(n => n.event_participant_id === ep.id);
-            }
-            return { ...ep, participant, notes };
-        }));
+        const { data: notesGaf } = await handleQuery({ url: NOTE_GAF__URL });
+        const { data: notesGam } = await handleQuery({ url: NOTE_GAM_URL });
+        const { status, data } = await handleQuery({ url: `${EVENT_PARTICIPANT_URL}?event_id=${event_id}` });
+        if (status === STATUS_CODES.OK) {
+            setEventParticipants(data.map((ep: EventParticipant) => {
+                const participant = dataParticipants.find((p: Participant) => p.id === ep.participant_id)!;
+                let notes;
+                if (participant.gender === 'F') {
+                    notes = notesGaf.find((n: NoteGaf) => n.event_participant_id === ep.id);
+                }
+                if (participant.gender === 'M') {
+                    notes = notesGam.find((n: NoteGam) => n.event_participant_id === ep.id);
+                }
+                return { ...ep, participant, notes };
+            }));
+        }
     }
 
     async function handleSubmit(
@@ -49,40 +53,54 @@ export function useEventParticipants() {
         e.preventDefault();
         if (!validate()) return;
         try {
-            const id: number = await EventParticipantService.create({
-                event_id: formData.event_id,
-                participant_id: formData.participant_id,
-                participant_institution_name: formData.participant_institution_name,
-                participant_level: formData.participant_level,
-                category: formData.category
+            const { status, data } = await handleQuery({
+                url: EVENT_PARTICIPANT_URL,
+                method: 'POST',
+                body: {
+                    event_id: formData.event_id,
+                    participant_id: formData.participant_id,
+                    participant_institution_name: formData.participant_institution_name,
+                    participant_level: formData.participant_level,
+                    category: formData.category
+                }
             });
-            const newNotes = {
-                event_participant_id: id,
-                salto_note: formData.salto_note,
-                paralelas_note: formData.paralelas_note,
-                suelo_note: formData.suelo_note,
-                penalization: formData.penalization
+            if (status === STATUS_CODES.CREATED) {
+                const newNotes = {
+                    event_participant_id: data.id,
+                    salto_note: formData.salto_note,
+                    paralelas_note: formData.paralelas_note,
+                    suelo_note: formData.suelo_note,
+                    penalization: formData.penalization
+                }
+                const newNotesGaf = { ...newNotes, viga_note: formData.viga_note }
+                const newNotesGam = {
+                    ...newNotes,
+                    barra_fija_note: formData.barra_fija_note,
+                    arzones_note: formData.arzones_note,
+                    anillas_note: formData.anillas_note,
+                    nd_note: formData.nd_note,
+                    ne_note: formData.ne_note
+                }
+                if (gender === 'F') await handleQuery({
+                    url: NOTE_GAF__URL,
+                    method: 'POST',
+                    body: newNotesGaf
+                })
+                if (gender === 'M') await handleQuery({
+                    url: NOTE_GAM_URL,
+                    method: 'POST',
+                    body: newNotesGam
+                })
+                setEventParticipants(prev => [...prev, {
+                    ...data,
+                    participant: participants.find(p => p.id === formData.participant_id)!,
+                    notes: gender === 'M' ? newNotesGam : newNotesGaf
+                }]);
+                setMessage('Participante registrado correctamente.');
+                reset();
+                setSeverity('success');
+                setAction(null);
             }
-            const newNotesGaf = { ...newNotes, viga_note: formData.viga_note }
-            const newNotesGam = {
-                ...newNotes,
-                barra_fija_note: formData.barra_fija_note,
-                arzones_note: formData.arzones_note,
-                anillas_note: formData.anillas_note,
-                nd_note: formData.nd_note,
-                ne_note: formData.ne_note
-            }
-            if (gender === 'F') await NotesService.createNoteGaf(newNotesGaf)
-            if (gender === 'M') await NotesService.createNoteGam(newNotesGam)
-            setEventParticipants(prev => [...prev, {
-                ...formData, id,
-                participant: participants.find(p => p.id === formData.participant_id)!,
-                notes: gender === 'M' ? newNotesGam : newNotesGaf
-            }]);
-            setMessage('Participante registrado correctamente.');
-            reset();
-            setSeverity('success');
-            setAction(null);
         } catch (e) {
             setSeverity('error');
             if (e instanceof Error) {
@@ -103,8 +121,16 @@ export function useEventParticipants() {
     ) {
         e.preventDefault();
         try {
-            if (gender === 'F') await NotesService.updateNoteGaf(data);
-            if (gender === 'M') await NotesService.updateNoteGam(data);
+            if (gender === 'F') await handleQuery({
+                url: `${NOTE_GAF__URL}/${data.id}`,
+                method: 'PUT',
+                body: data
+            });
+            if (gender === 'M') await handleQuery({
+                url: `${NOTE_GAM_URL}/${data.id}`,
+                method: 'PUT',
+                body: data
+            });
             setMessage('Notas actualizadas correctamente.');
             setEventParticipants(prev => [...prev.filter(ep => ep.id !== data.event_participant_id), {
                 ...prev.find(ep => ep.id === data.event_participant_id)!,
@@ -124,20 +150,19 @@ export function useEventParticipants() {
     }
 
     async function destroy(id: number, reset: () => void, setAction: (arg0: null) => void): Promise<void> {
-        try {
-            await EventParticipantService.destroy(id);
-            setEventParticipants(prev => [...prev.filter(ev => ev.id !== id)]);
+        const { status, data } = await handleQuery({
+            url: `${EVENT_PARTICIPANT_URL}/${id}`,
+            method: 'DELETE'
+        });
+        if (status === STATUS_CODES.OK) {
+            setEventParticipants(prev => [...prev.filter(ep => ep.id !== data.id)]);
             setMessage('Registro eliminado correctamente.');
             setSeverity('success');
             setAction(null);
             reset();
-        } catch (e) {
-            setSeverity('error');
-            if (e instanceof Error) {
-                setMessage(`Ocurrió un error: ${e.message}`);
-            } else {
-                setMessage('Ocurrió un error inesperado.');
-            }
+        } else {
+            setMessage(data.message)
+            setSeverity('error')
         }
         setOpenMessage(true);
     }

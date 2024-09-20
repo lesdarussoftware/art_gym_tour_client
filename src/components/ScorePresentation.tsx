@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-import { EventParticipant } from '../server/db';
+import { EventParticipant } from '../helpers/types';
 
 import { getTotalGaf, getTotalGam } from '../helpers/utils';
 

@@ -103,7 +103,7 @@ export function Participants() {
                         sx={{ color: '#fff', px: 2 }}
                         onClick={async () => {
                             if (confirmDelete) {
-                                await destroy(participantFormData.formData.id, participantFormData.reset, setAction)
+                                await destroy(participantFormData.formData.id, setAction, participantFormData.reset)
                                 setConfirmDelete(false)
                             } else {
                                 setConfirmDelete(true)

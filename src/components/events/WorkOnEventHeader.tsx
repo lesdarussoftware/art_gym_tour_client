@@ -1,7 +1,7 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { format } from "date-fns";
 
-import { Event } from "../../server/db";
+import { Event } from "../../helpers/types";
 
 export function WorkOnEventHeader({ event }: { event: Event }) {
     return (

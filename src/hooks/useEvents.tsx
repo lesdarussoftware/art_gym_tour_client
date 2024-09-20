@@ -63,8 +63,7 @@ export function useEvents() {
     async function destroy(
         id: number,
         setAction: (arg0: null) => void,
-        reset: () => void,
-        setDisabled: (arg0: boolean) => void
+        reset: () => void
     ): Promise<void> {
         const { status, data } = await handleQuery({
             url: `${EVENT_URL}/${id}`,
@@ -79,7 +78,6 @@ export function useEvents() {
         } else {
             setMessage(data.message)
             setSeverity('error')
-            setDisabled(false)
         }
         setOpenMessage(true);
     }

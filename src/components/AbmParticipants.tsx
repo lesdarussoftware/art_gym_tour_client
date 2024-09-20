@@ -12,7 +12,7 @@ import { LEVELS } from "../helpers/constants";
 
 type Props = {
     participantFormData: any;
-    action: null | 'NEW' | 'EDIT' | 'DELETE';
+    action: 'NEW' | 'EDIT';
     setAction: any
 }
 

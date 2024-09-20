@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Box, FormControl, InputLabel, Select, MenuItem, Typography, TextField } from '@mui/material';
 
-import { NoteGaf, NoteGam, Participant } from '../server/db';
+import { NoteGaf, NoteGam, Participant } from '../helpers/types';
 import { getAllowedParticipants, getTotalGaf, getTotalGam } from '../helpers/utils';
 
 interface AbmEventParticipantsProps {
