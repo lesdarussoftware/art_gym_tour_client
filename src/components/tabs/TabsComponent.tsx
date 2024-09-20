@@ -53,15 +53,33 @@ export function TabsComponent({
     const [showScore, setShowScore] = useState(false);
     const [notes, setNotes] = useState({
         salto_note: 0,
+        salto_nd: 0,
+        salto_ne: 0,
+        salto_penalization: 0,
         paralelas_note: 0,
-        suelo_note: 0,
-        viga_note: 0,
+        paralelas_nd: 0,
+        paralelas_ne: 0,
+        paralelas_penalization: 0,
         barra_fija_note: 0,
+        barra_fija_nd: 0,
+        barra_fija_ne: 0,
+        barra_fija_penalization: 0,
+        suelo_note: 0,
+        suelo_nd: 0,
+        suelo_ne: 0,
+        suelo_penalization: 0,
         arzones_note: 0,
+        arzones_nd: 0,
+        arzones_ne: 0,
+        arzones_penalization: 0,
         anillas_note: 0,
-        penalization: 0,
-        nd_note: 10,
-        ne_note: 0,
+        anillas_nd: 0,
+        anillas_ne: 0,
+        anillas_penalization: 0,
+        viga_note: 0,
+        viga_nd: 0,
+        viga_ne: 0,
+        penalization: 0
     });
 
     useEffect(() => {
