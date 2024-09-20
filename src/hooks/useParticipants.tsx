@@ -32,19 +32,18 @@ export function useParticipants() {
         validate: () => any,
         reset: () => void,
         setDisabled: (arg0: boolean) => void,
-        action: 'NEW' | 'EDIT',
+        action: "NEW" | "EDIT" | "DELETE" | null,
         setAction: (arg0: null) => void
     ) {
         e.preventDefault();
         if (validate()) {
-            const urls = { 'NEW': PARTICIPANT_URL, 'EDIT': `${PARTICIPANT_URL}/${formData.id}` }
             const { status, data } = await handleQuery({
-                url: urls[action],
+                url: action === 'EDIT' ? `${PARTICIPANT_URL}/${formData.id}` : PARTICIPANT_URL,
                 method: action === 'NEW' ? 'POST' : action === 'EDIT' ? 'PUT' : 'GET',
                 body: formData
             })
             if (status === STATUS_CODES.CREATED) {
-                setParticipants(data)
+                setParticipants([data, ...participants])
                 setMessage('Participante registrado correctamente.')
             } else if (status === STATUS_CODES.OK) {
                 setParticipants([data, ...participants.filter(p => p.id !== data.id)])
@@ -139,8 +138,8 @@ export function useParticipants() {
             numeric: false,
             disablePadding: true,
             label: 'Edad',
-            sorter: (row: Participant) => getParticipantAge(row.birth.toISOString().split('T')[0]),
-            accessor: (row: Participant) => getParticipantAge(row.birth.toISOString().split('T')[0])
+            sorter: (row: Participant) => getParticipantAge(row.birth.split(' ')[0]),
+            accessor: (row: Participant) => getParticipantAge(row.birth.split(' ')[0])
         },
         {
             id: 'gender',
@@ -171,8 +170,8 @@ export function useParticipants() {
             numeric: false,
             disablePadding: true,
             label: 'Categoría actual',
-            sorter: (row: Participant) => getParticipantCategory(row.birth, row.gender),
-            accessor: (row: Participant) => getParticipantCategory(row.birth, row.gender)
+            sorter: (row: Participant) => getParticipantCategory(row.birth.split(' ')[0], row.gender),
+            accessor: (row: Participant) => getParticipantCategory(row.birth.split(' ')[0], row.gender)
         }
     ]
 

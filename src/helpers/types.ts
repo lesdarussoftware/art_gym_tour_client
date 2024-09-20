@@ -12,7 +12,7 @@ export interface Participant {
     first_name: string;
     last_name: string;
     dni: string;
-    birth: Date;
+    birth: string;
     gender: 'M' | 'F';
     phone?: string;
     institution?: string;

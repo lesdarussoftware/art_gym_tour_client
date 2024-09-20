@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 
-import { ActivationService } from "../server/activation";
+// import { ActivationService } from "../server/activation";
 import { License } from "../providers/LicenseProvider";
 
 export function useLicense() {
@@ -9,8 +9,8 @@ export function useLicense() {
     const [isActivated, setIsActivated] = useState(false)
 
     async function isAppActivated() {
-        const result = await ActivationService.isActivated();
-        setIsActivated(result);
+        // const result = await ActivationService.isActivated();
+        // setIsActivated(result);
     }
 
     function isLicenseExpired(license: License) {

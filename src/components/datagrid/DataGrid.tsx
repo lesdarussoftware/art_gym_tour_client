@@ -171,7 +171,7 @@ export function DataGrid({
                                                     .map((accessor: any, idx: number) => (
                                                         <TableCell
                                                             key={idx}
-                                                            align="inherit"
+                                                            align="left"
                                                         >
                                                             {typeof accessor === "function"
                                                                 ? accessor(row, index)
@@ -185,7 +185,7 @@ export function DataGrid({
                                     <TableRow>
                                         <TableCell
                                             colSpan={headCells.length + 1}
-                                            align="inherit"
+                                            align="center"
                                             sx={{
                                                 fontSize: "1rem",
                                                 textAlign: 'center'

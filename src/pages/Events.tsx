@@ -53,7 +53,7 @@ export function Events() {
         if (confirmDelete) setConfirmDelete(false);
     }
 
-    if (!license.hash && !isActivated) return <Login />
+    // if (!license.hash && !isActivated) return <Login />
 
     return (
         <Layout>

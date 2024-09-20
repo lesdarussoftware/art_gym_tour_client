@@ -1,40 +1,48 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect } from "react";
 import { Box, Button, Checkbox, FormControl, FormControlLabel, Input, InputLabel, MenuItem, Select, Typography } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { es } from "date-fns/locale"
-
-import { useParticipants } from "../hooks/useParticipants";
 
 import { LEVELS } from "../helpers/constants";
 
 type Props = {
     participantFormData: any;
-    action: 'NEW' | 'EDIT';
+    action: "NEW" | "EDIT" | "DELETE" | null;
     setAction: any
+    handleSubmit: any
 }
 
-export function AbmParticipants({ participantFormData, action, setAction }: Props) {
+export function AbmParticipants({ participantFormData, action, setAction, handleSubmit }: Props) {
 
-    const { handleSubmit } = useParticipants();
-    const { handleChange, formData, setFormData, errors, disabled, reset, validate, setDisabled } = participantFormData;
+    const {
+        handleChange,
+        formData,
+        setFormData,
+        errors,
+        disabled,
+        reset,
+        validate,
+        setDisabled
+    } = participantFormData;
+
+    useEffect(() => {
+        if (formData.gender === 'M') {
+            setFormData({
+                ...formData,
+                level: ''
+            })
+        }
+    }, [formData.gender])
 
     return (
-        <Box sx={{ width: { xs: '100%', sm: '70%', maxWidth: '1000px' }, display: 'block', margin: 'auto', mt: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6">
-                    {action === 'NEW' && 'Nuevo participante'}
-                    {action === 'EDIT' && `Editar participante #${formData.id}`}
-                </Typography>
-                <Button variant="outlined" onClick={() => {
-                    reset();
-                    setAction(null);
-                }}>
-                    <KeyboardBackspaceIcon />
-                </Button>
-            </Box>
+        <Box sx={{ width: { xs: '100%', sm: '70%', maxWidth: '1000px' }, display: 'block', margin: 'auto' }}>
+            <Typography variant="h6" mb={1}>
+                {action === 'NEW' && 'Nuevo participante'}
+                {action === 'EDIT' && `Editar participante #${formData.id}`}
+            </Typography>
             <form onChange={handleChange} onSubmit={(e) => handleSubmit(
                 e,
                 formData,
@@ -44,8 +52,8 @@ export function AbmParticipants({ participantFormData, action, setAction }: Prop
                 action,
                 setAction
             )}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    <Box sx={{ display: 'flex', gap: 3 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
                         <FormControl sx={{ width: '50%' }}>
                             <InputLabel htmlFor="first_name">Nombre</InputLabel>
                             <Input id="first_name" type="text" name="first_name" value={formData.first_name} />
@@ -75,7 +83,7 @@ export function AbmParticipants({ participantFormData, action, setAction }: Prop
                             }
                         </FormControl>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 3, mt: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
                         <FormControl sx={{ width: '50%' }}>
                             <InputLabel htmlFor="dni">DNI</InputLabel>
                             <Input id="dni" type="text" name="dni" value={formData.dni} />
@@ -105,7 +113,7 @@ export function AbmParticipants({ participantFormData, action, setAction }: Prop
                             }
                         </FormControl>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 3, mt: 1, alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', gap: 2, mt: 1, alignItems: 'center' }}>
                         <FormControl sx={{ width: '50%' }}>
                             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
                                 <DatePicker
@@ -135,7 +143,7 @@ export function AbmParticipants({ participantFormData, action, setAction }: Prop
                             />
                         </Box>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 3, mt: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
                         <FormControl sx={{ width: '50%' }}>
                             <InputLabel id="level-select">Nivel</InputLabel>
                             <Select
@@ -145,6 +153,7 @@ export function AbmParticipants({ participantFormData, action, setAction }: Prop
                                 label="Nivel"
                                 name="level"
                                 sx={{ width: '100%' }}
+                                disabled={formData.gender === 'M'}
                                 onChange={handleChange}
                             >
                                 <MenuItem value="">Seleccione</MenuItem>
@@ -152,7 +161,7 @@ export function AbmParticipants({ participantFormData, action, setAction }: Prop
                                     <MenuItem key={lvl} value={lvl}>{lvl}</MenuItem>
                                 ))}
                             </Select>
-                            {errors.level?.type === 'required' &&
+                            {formData.level?.length === 0 && formData.gender === 'F' &&
                                 <Typography variant="caption" color="red" marginTop={1}>
                                     * El nivel es requerido.
                                 </Typography>

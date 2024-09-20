@@ -89,8 +89,8 @@ export function getParticipantAge(birthDate: string): number {
     return age;
 }
 
-export function getParticipantCategory(birth: Date, gender: 'M' | 'F') {
-    const age = getParticipantAge(birth.toISOString().split('T')[0]);
+export function getParticipantCategory(birth: string, gender: 'M' | 'F') {
+    const age = getParticipantAge(birth);
     const genderCategories = CATEGORIES_BY_AGE[gender];
     const category = (Object.keys(genderCategories) as Array<keyof typeof genderCategories>).find(cat => {
         return (genderCategories[cat].length === 1 && genderCategories[cat][0] <= age) ||
@@ -105,7 +105,7 @@ export function getAllowedParticipants(
     level: string,
     expectedCategory: string
 ): any {
-    return participants.filter((p: { birth: Date; gender: string; level: string; }) => {
+    return participants.filter((p: { birth: string; gender: string; level: string; }) => {
         const category = getParticipantCategory(p.birth, gender);
         return p.gender === gender && p.level === level && category === expectedCategory && category !== undefined;
     });

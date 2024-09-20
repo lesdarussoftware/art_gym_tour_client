@@ -12,7 +12,15 @@ import { DataGrid } from "../components/datagrid/DataGrid";
 
 export function Participants() {
 
-    const { participants, getParticipants, action, setAction, destroy, headCells } = useParticipants();
+    const {
+        participants,
+        getParticipants,
+        action,
+        setAction,
+        destroy,
+        headCells,
+        handleSubmit
+    } = useParticipants();
     const participantFormData = useForm({
         defaultData: {
             id: '',
@@ -28,7 +36,6 @@ export function Participants() {
         rules: {
             first_name: { required: true, maxLength: 55 },
             last_name: { required: true, maxLength: 55 },
-            level: { required: true },
             dni: { required: true, minLength: 6, maxLength: 10 },
             phone: { maxLength: 25 },
             institution_name: { maxLength: 55 }
@@ -38,22 +45,18 @@ export function Participants() {
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     useEffect(() => {
-        if (!action) getParticipants();
-    }, [action])
+        getParticipants();
+    }, [])
 
     const handleClose = () => {
         setAction(null);
+        participantFormData.reset();
         if (confirmDelete) setConfirmDelete(false);
     }
 
     return (
         <Layout>
-            {!action && participants.length === 0 &&
-                <Typography variant="h5" align="center" pt={3}>
-                    No hay participantes registrados.
-                </Typography>
-            }
-            {(!action || action === 'DELETE') && participants.length > 0 &&
+            {(!action || action === 'DELETE') &&
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'space-between' }}>
                     <DataGrid
                         headCells={headCells}
@@ -76,13 +79,14 @@ export function Participants() {
                     />
                 </Box>
             }
-            {(action === 'NEW' || action === 'EDIT') &&
+            <ModalComponent open={action === 'NEW' || action === 'EDIT'} onClose={handleClose}>
                 <AbmParticipants
                     participantFormData={participantFormData}
                     action={action}
                     setAction={setAction}
+                    handleSubmit={handleSubmit}
                 />
-            }
+            </ModalComponent>
             <ModalComponent open={action === 'DELETE'} onClose={handleClose}>
                 <Typography variant='h6' align='center' mb={1}>
                     {`¿Eliminar el registro de ${participantFormData.formData?.first_name} 
