@@ -7,7 +7,7 @@ import { useQuery } from "./useQuery";
 
 import { Participant, EventParticipant, NoteGaf, NoteGam } from "../helpers/types";
 import { getTotalGaf, getTotalGam } from "../helpers/utils";
-import { PARTICIPANT_URL, NOTE_GAF__URL, NOTE_GAM_URL, EVENT_PARTICIPANT_URL } from "../helpers/urls";
+import { NOTE_GAF__URL, NOTE_GAM_URL, EVENT_PARTICIPANT_URL } from "../helpers/urls";
 import { STATUS_CODES } from "../helpers/constants";
 
 export function useEventParticipants() {
@@ -16,28 +16,13 @@ export function useEventParticipants() {
 
     const { handleQuery } = useQuery()
 
-    const [participants, setParticipants] = useState<Participant[]>([]);
     const [eventParticipants, setEventParticipants] = useState<EventParticipant[]>([]);
     const [action, setAction] = useState<null | 'NEW' | 'EDIT' | 'DELETE'>(null);
 
-    async function getAll(event_id: number): Promise<void> {
-        const { data: dataParticipants } = await handleQuery({ url: PARTICIPANT_URL });
-        setParticipants(dataParticipants);
-        const { data: notesGaf } = await handleQuery({ url: NOTE_GAF__URL });
-        const { data: notesGam } = await handleQuery({ url: NOTE_GAM_URL });
+    async function getEventParticipants(event_id: number): Promise<void> {
         const { status, data } = await handleQuery({ url: `${EVENT_PARTICIPANT_URL}?event_id=${event_id}` });
         if (status === STATUS_CODES.OK) {
-            setEventParticipants(data.map((ep: EventParticipant) => {
-                const participant = dataParticipants.find((p: Participant) => p.id === ep.participant_id)!;
-                let notes;
-                if (participant.gender === 'F') {
-                    notes = notesGaf.find((n: NoteGaf) => n.event_participant_id === ep.id);
-                }
-                if (participant.gender === 'M') {
-                    notes = notesGam.find((n: NoteGam) => n.event_participant_id === ep.id);
-                }
-                return { ...ep, participant, notes };
-            }));
+            setEventParticipants(data);
         }
     }
 
@@ -91,11 +76,7 @@ export function useEventParticipants() {
                     method: 'POST',
                     body: newNotesGam
                 })
-                setEventParticipants(prev => [...prev, {
-                    ...data,
-                    participant: participants.find(p => p.id === formData.participant_id)!,
-                    notes: gender === 'M' ? newNotesGam : newNotesGaf
-                }]);
+                setEventParticipants(prev => [...prev, ...data,]);
                 setMessage('Participante registrado correctamente.');
                 reset();
                 setSeverity('success');
@@ -334,7 +315,7 @@ export function useEventParticipants() {
 
     return {
         eventParticipants,
-        getAll,
+        getEventParticipants,
         action,
         setAction,
         headCellsGaf,

@@ -4,7 +4,6 @@ import { Button, Tabs, Tab, Box, Typography } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 import { useEventParticipants } from '../../hooks/useEventParticipants';
-import { useParticipants } from '../../hooks/useParticipants';
 import { useForm } from '../../hooks/useForm';
 
 import { DataGrid } from '../datagrid/DataGrid';
@@ -14,24 +13,25 @@ import { AbmEventParticipants } from '../AbmEventParticipants';
 import { ScorePresentation } from '../ScorePresentation';
 
 import { a11yProps, getAllowedParticipants } from '../../helpers/utils';
-import { EventParticipant } from '../../helpers/types';
+import { Participant } from '../../helpers/types';
 
 export function TabsComponent({
     level,
     event_id,
     categories,
     headCells,
-    gender
+    gender,
+    participants
 }: {
     level: string;
     event_id: number;
     categories: string[];
     headCells: any[];
-    gender: 'F' | 'M'
+    gender: 'F' | 'M';
+    participants: Participant[]
 }) {
 
-    const { getParticipants, participants } = useParticipants();
-    const { getAll, eventParticipants, action, setAction, handleSubmit, destroy, updateNotes } = useEventParticipants();
+    const { eventParticipants, action, setAction, handleSubmit, destroy, updateNotes } = useEventParticipants();
     const { formData, handleChange, setFormData, errors, disabled, validate, reset, setDisabled } = useForm({
         defaultData: {
             id: '',
@@ -83,11 +83,6 @@ export function TabsComponent({
     });
 
     useEffect(() => {
-        getParticipants();
-        getAll(event_id);
-    }, []);
-
-    useEffect(() => {
         if (formData.participant_id.toString().length > 0) {
             setFormData({
                 ...formData,
@@ -108,8 +103,6 @@ export function TabsComponent({
         if (confirmDelete) setConfirmDelete(false);
     }
 
-    const NE_LEVELS = ['NIVEL 6', 'NIVEL 7', 'NIVEL 8', 'NIVEL 9'];
-
     return (
         <Box sx={{ width: '100%' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -123,53 +116,7 @@ export function TabsComponent({
                 return (
                     <CustomTabPanel key={idx} value={value} index={idx}>
                         <DataGrid
-                            headCells={gender === 'M' && NE_LEVELS.includes(level) ?
-                                [
-                                    ...headCells,
-                                    {
-                                        id: 'nd_note',
-                                        numeric: false,
-                                        disablePadding: true,
-                                        label: 'ND',
-                                        sorter: (row: EventParticipant & { notes: { nd_note: string } }) => parseInt(row.notes.nd_note),
-                                        accessor: (row: EventParticipant & { notes: { nd_note: string } }) => parseInt(row.notes.nd_note)
-                                    },
-                                    {
-                                        id: 'ne_note',
-                                        numeric: false,
-                                        disablePadding: true,
-                                        label: 'NE',
-                                        sorter: (row: EventParticipant & { notes: { ne_note: string } }) => parseInt(row.notes.ne_note),
-                                        accessor: (row: EventParticipant & { notes: { ne_note: string } }) => parseInt(row.notes.ne_note)
-                                    },
-                                    {
-                                        id: 'nf_note',
-                                        numeric: false,
-                                        disablePadding: true,
-                                        label: 'NF',
-                                        sorter: (row: EventParticipant &
-                                        {
-                                            notes: {
-                                                nd_note: string;
-                                                ne_note: string;
-                                            }
-                                        }) => {
-                                            const result = parseInt(row.notes.nd_note) - parseInt(row.notes.ne_note);
-                                            return isNaN(result) ? 0 : result;
-                                        },
-                                        accessor: (row: EventParticipant &
-                                        {
-                                            notes: {
-                                                nd_note: string;
-                                                ne_note: string;
-                                            }
-                                        }) => {
-                                            const result = parseInt(row.notes.nd_note) - parseInt(row.notes.ne_note);
-                                            return isNaN(result) ? 0 : result;
-                                        }
-                                    },
-                                ] : headCells
-                            }
+                            headCells={headCells}
                             rows={eventParticipants.filter(ep => {
                                 return ep.category === cat &&
                                     ep.participant_level === level &&

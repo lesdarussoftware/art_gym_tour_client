@@ -107,6 +107,9 @@ export function getAllowedParticipants(
 ): any {
     return participants.filter((p: { birth: string; gender: string; level: string; }) => {
         const category = getParticipantCategory(p.birth, gender);
-        return p.gender === gender && p.level === level && category === expectedCategory && category !== undefined;
+        return p.gender === gender &&
+            (level === 'MALE' || p.level === level) &&
+            category === expectedCategory &&
+            category !== undefined;
     });
 }

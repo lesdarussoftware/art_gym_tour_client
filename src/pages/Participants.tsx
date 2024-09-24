@@ -56,29 +56,27 @@ export function Participants() {
 
     return (
         <Layout>
-            {(!action || action === 'DELETE') &&
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'space-between' }}>
-                    <DataGrid
-                        headCells={headCells}
-                        rows={participants}
-                        showEditAction
-                        showDeleteAction
-                        setData={participantFormData.setFormData}
-                        setAction={setAction}
-                        contentHeader={
-                            <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-                                <Button
-                                    variant="contained"
-                                    sx={{ color: '#FFF', mt: 1, mb: 3 }}
-                                    onClick={() => setAction('NEW')}
-                                >
-                                    <AddCircleIcon />
-                                </Button>
-                            </Box>
-                        }
-                    />
-                </Box>
-            }
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'space-between' }}>
+                <DataGrid
+                    headCells={headCells}
+                    rows={participants}
+                    showEditAction
+                    showDeleteAction
+                    setData={participantFormData.setFormData}
+                    setAction={setAction}
+                    contentHeader={
+                        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                            <Button
+                                variant="contained"
+                                sx={{ color: '#FFF', mt: 1, mb: 3 }}
+                                onClick={() => setAction('NEW')}
+                            >
+                                <AddCircleIcon />
+                            </Button>
+                        </Box>
+                    }
+                />
+            </Box>
             <ModalComponent open={action === 'NEW' || action === 'EDIT'} onClose={handleClose}>
                 <AbmParticipants
                     participantFormData={participantFormData}

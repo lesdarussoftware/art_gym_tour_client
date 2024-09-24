@@ -23,8 +23,8 @@ export function WorkOnEvent({ eventFormData, setAction }: Props) {
 
     const { formData: event } = eventFormData;
 
-    const { headCellsGaf, headCellsGam } = useEventParticipants()
-    const { getParticipants } = useParticipants();
+    const { headCellsGaf, headCellsGam, getEventParticipants } = useEventParticipants()
+    const { getParticipants, participants } = useParticipants();
 
     const [value, setValue] = useState(0);
     const [expanded, setExpanded] = useState<string | false>(false);
@@ -35,6 +35,7 @@ export function WorkOnEvent({ eventFormData, setAction }: Props) {
     };
 
     useEffect(() => {
+        getEventParticipants(event.id);
         getParticipants();
     }, []);
 
@@ -71,32 +72,21 @@ export function WorkOnEvent({ eventFormData, setAction }: Props) {
                                 categories={CATEGORIES_GAF}
                                 headCells={headCellsGaf}
                                 gender="F"
+                                participants={participants}
                             />
                         </AccordionDetails>
                     </Accordion>
                 ))}
             </CustomTabPanel>
             <CustomTabPanel value={1} index={value}>
-                {LEVELS.map((level, lvlIdx) => (
-                    <Accordion
-                        key={lvlIdx}
-                        expanded={expanded === `panel${lvlIdx}`}
-                        onChange={handleChangeAccordion(`panel${lvlIdx}`)}
-                    >
-                        <AccordionSummary aria-controls={`panel${lvlIdx}d-content`} id={`panel${lvlIdx}d-header`}>
-                            <Typography>{level}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <TabsComponent
-                                level={level}
-                                event_id={event.id}
-                                categories={CATEGORIES_GAM}
-                                headCells={headCellsGam}
-                                gender="M"
-                            />
-                        </AccordionDetails>
-                    </Accordion>
-                ))}
+                <TabsComponent
+                    level="MALE"
+                    event_id={event.id}
+                    categories={CATEGORIES_GAM}
+                    headCells={headCellsGam}
+                    gender="M"
+                    participants={participants}
+                />
             </CustomTabPanel>
         </Box>
     );
