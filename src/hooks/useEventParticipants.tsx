@@ -9,14 +9,15 @@ import { Participant, EventParticipant, NoteGaf, NoteGam } from "../helpers/type
 import { getTotalGaf, getTotalGam } from "../helpers/utils";
 import { NOTE_GAF__URL, NOTE_GAM_URL, EVENT_PARTICIPANT_URL } from "../helpers/urls";
 import { STATUS_CODES } from "../helpers/constants";
+import { EventParticipantContext } from "../providers/EventParticipantProvider";
 
 export function useEventParticipants() {
 
     const { setSeverity, setMessage, setOpenMessage } = useContext(MessageContext);
+    const { setEventParticipants } = useContext(EventParticipantContext)
 
     const { handleQuery } = useQuery()
 
-    const [eventParticipants, setEventParticipants] = useState<EventParticipant[]>([]);
     const [action, setAction] = useState<null | 'NEW' | 'EDIT' | 'DELETE'>(null);
 
     async function getEventParticipants(event_id: number): Promise<void> {
@@ -36,8 +37,7 @@ export function useEventParticipants() {
         gender: 'M' | 'F'
     ) {
         e.preventDefault();
-        if (!validate()) return;
-        try {
+        if (validate()) {
             const { status, data } = await handleQuery({
                 url: EVENT_PARTICIPANT_URL,
                 method: 'POST',
@@ -45,7 +45,7 @@ export function useEventParticipants() {
                     event_id: formData.event_id,
                     participant_id: formData.participant_id,
                     participant_institution_name: formData.participant_institution_name,
-                    participant_level: formData.participant_level,
+                    participant_level: formData.participant_level !== 'MALE' ? formData.participant_level : undefined,
                     category: formData.category
                 }
             });
@@ -53,45 +53,95 @@ export function useEventParticipants() {
                 const newNotes = {
                     event_participant_id: data.id,
                     salto_note: formData.salto_note,
+                    salto_ne: formData.salto_ne,
+                    salto_nd: formData.salto_nd,
                     paralelas_note: formData.paralelas_note,
+                    paralelas_nd: formData.paralelas_nd,
+                    paralelas_ne: formData.paralelas_ne,
                     suelo_note: formData.suelo_note,
+                    suelo_nd: formData.suelo_nd,
+                    suelo_ne: formData.suelo_ne
+                }
+                const newNotesGaf = {
+                    ...newNotes,
+                    viga_note: formData.viga_note,
+                    viga_nd: formData.viga_nd,
+                    viga_ne: formData.viga_ne,
                     penalization: formData.penalization
                 }
-                const newNotesGaf = { ...newNotes, viga_note: formData.viga_note }
                 const newNotesGam = {
                     ...newNotes,
+                    salto_penalization: formData.salto_penalization,
+                    paralelas_penalization: formData.paralelas_penalization,
+                    suelo_penalization: formData.suelo_penalization,
                     barra_fija_note: formData.barra_fija_note,
+                    barra_fija_nd: formData.barra_fija_nd,
+                    barra_fija_ne: formData.barra_fija_ne,
+                    barra_fija_penalization: formData.barra_fija_penalization,
                     arzones_note: formData.arzones_note,
+                    arzones_nd: formData.arzones_nd,
+                    arzones_ne: formData.arzones_ne,
+                    arzones_penalization: formData.arzones_penalization,
                     anillas_note: formData.anillas_note,
-                    nd_note: formData.nd_note,
-                    ne_note: formData.ne_note
+                    anillas_nd: formData.anillas_nd,
+                    anillas_ne: formData.anillas_ne,
+                    anillas_penalization: formData.anillas_penalization
                 }
-                if (gender === 'F') await handleQuery({
-                    url: NOTE_GAF__URL,
-                    method: 'POST',
-                    body: newNotesGaf
-                })
-                if (gender === 'M') await handleQuery({
-                    url: NOTE_GAM_URL,
-                    method: 'POST',
-                    body: newNotesGam
-                })
-                setEventParticipants(prev => [...prev, ...data,]);
-                setMessage('Participante registrado correctamente.');
-                reset();
-                setSeverity('success');
-                setAction(null);
-            }
-        } catch (e) {
-            setSeverity('error');
-            if (e instanceof Error) {
-                setMessage(`Ocurrió un error: ${e.message}`);
+                if (gender === 'F') {
+                    const { status: statusNoteGaf, data: dataNoteGaf } = await handleQuery({
+                        url: NOTE_GAF__URL,
+                        method: 'POST',
+                        body: newNotesGaf
+                    })
+                    if (statusNoteGaf === STATUS_CODES.CREATED) {
+                        setEventParticipants(prev => [
+                            ...prev,
+                            {
+                                ...data,
+                                notes_gaf: dataNoteGaf
+                            }
+                        ]);
+                        setMessage('Participante registrado correctamente.');
+                        reset();
+                        setSeverity('success');
+                        setAction(null);
+                    } else {
+                        setMessage('Ocurrió un error.');
+                        setSeverity('error');
+                        setDisabled(false);
+                    }
+                }
+                if (gender === 'M') {
+                    const { status: statusNoteGam, data: dataNoteGam } = await handleQuery({
+                        url: NOTE_GAM_URL,
+                        method: 'POST',
+                        body: newNotesGam
+                    })
+                    if (statusNoteGam === STATUS_CODES.CREATED) {
+                        setEventParticipants(prev => [
+                            ...prev,
+                            {
+                                ...data,
+                                notes_gam: dataNoteGam
+                            }
+                        ]);
+                        setMessage('Participante registrado correctamente.');
+                        reset();
+                        setSeverity('success');
+                        setAction(null);
+                    } else {
+                        setMessage('Ocurrió un error.');
+                        setSeverity('error');
+                        setDisabled(false);
+                    }
+                }
             } else {
-                setMessage('Ocurrió un error inesperado.');
+                setMessage('Ocurrió un error.');
+                setSeverity('error');
+                setDisabled(false);
             }
+            setOpenMessage(true);
         }
-        setDisabled(false);
-        setOpenMessage(true);
     }
 
     async function updateNotes(
@@ -314,7 +364,6 @@ export function useEventParticipants() {
     ], []);
 
     return {
-        eventParticipants,
         getEventParticipants,
         action,
         setAction,

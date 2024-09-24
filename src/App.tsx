@@ -4,6 +4,7 @@ import { ThemeProvider } from "@emotion/react"
 
 import { MessageProvider } from "./providers/MessageProvider"
 import { LicenseProvider } from "./providers/LicenseProvider"
+import { EventParticipantProvider } from "./providers/EventParticipantProvider"
 
 import { Events } from "./pages/Events"
 import { Participants } from "./pages/Participants"
@@ -22,12 +23,14 @@ function App() {
     <ThemeProvider theme={theme}>
       <MessageProvider>
         <LicenseProvider>
-          <BrowserRouter basename="/gimnasia-artistica">
-            <Routes>
-              <Route path="/" element={<Events />} />
-              <Route path="/participants" element={<Participants />} />
-            </Routes>
-          </BrowserRouter>
+          <EventParticipantProvider>
+            <BrowserRouter basename="/gimnasia-artistica">
+              <Routes>
+                <Route path="/" element={<Events />} />
+                <Route path="/participants" element={<Participants />} />
+              </Routes>
+            </BrowserRouter>
+          </EventParticipantProvider>
         </LicenseProvider>
       </MessageProvider>
     </ThemeProvider>

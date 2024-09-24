@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Button, Tabs, Tab, Box, Typography } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
+import { EventParticipantContext } from '../../providers/EventParticipantProvider';
 import { useEventParticipants } from '../../hooks/useEventParticipants';
 import { useForm } from '../../hooks/useForm';
 
@@ -31,7 +32,9 @@ export function TabsComponent({
     participants: Participant[]
 }) {
 
-    const { eventParticipants, action, setAction, handleSubmit, destroy, updateNotes } = useEventParticipants();
+    const { eventParticipants } = useContext(EventParticipantContext)
+
+    const { action, setAction, handleSubmit, destroy, updateNotes } = useEventParticipants();
     const { formData, handleChange, setFormData, errors, disabled, validate, reset, setDisabled } = useForm({
         defaultData: {
             id: '',

@@ -69,14 +69,14 @@ export function AbmEventParticipants({
                         id: notes.id,
                         event_participant_id: notes.event_participant_id,
                         salto_note: notes.salto_note,
-                        suelo_nd: notes.suelo_nd,
-                        suelo_ne: notes.suelo_ne,
+                        salto_nd: notes.salto_nd,
+                        salto_ne: notes.salto_ne,
                         paralelas_note: notes.paralelas_note,
                         paralelas_nd: notes.paralelas_nd,
                         paralelas_ne: notes.paralelas_ne,
                         suelo_note: notes.suelo_note,
-                        salto_nd: notes.salto_nd,
-                        salto_ne: notes.salto_ne
+                        suelo_nd: notes.suelo_nd,
+                        suelo_ne: notes.suelo_ne
                     }
                     const newNotesGaf = {
                         ...newNotes,
