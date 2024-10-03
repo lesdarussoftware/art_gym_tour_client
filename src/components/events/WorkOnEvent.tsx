@@ -23,7 +23,7 @@ export function WorkOnEvent({ eventFormData, setAction }: Props) {
 
     const { formData: event } = eventFormData;
 
-    const { headCellsGaf, headCellsGam, getEventParticipants } = useEventParticipants()
+    const { getEventParticipants } = useEventParticipants()
     const { getParticipants, participants } = useParticipants();
 
     const [value, setValue] = useState(0);
@@ -70,7 +70,6 @@ export function WorkOnEvent({ eventFormData, setAction }: Props) {
                                 level={level}
                                 event_id={event.id}
                                 categories={CATEGORIES_GAF}
-                                headCells={headCellsGaf}
                                 gender="F"
                                 participants={participants}
                             />
@@ -83,7 +82,6 @@ export function WorkOnEvent({ eventFormData, setAction }: Props) {
                     level="MALE"
                     event_id={event.id}
                     categories={CATEGORIES_GAM}
-                    headCells={headCellsGam}
                     gender="M"
                     participants={participants}
                 />

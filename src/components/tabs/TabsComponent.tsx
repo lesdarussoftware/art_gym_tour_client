@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Button, Tabs, Tab, Box, Typography } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import EditIcon from '@mui/icons-material/Edit';
 
 import { EventParticipantContext } from '../../providers/EventParticipantProvider';
 import { useEventParticipants } from '../../hooks/useEventParticipants';
@@ -20,14 +21,12 @@ export function TabsComponent({
     level,
     event_id,
     categories,
-    headCells,
     gender,
     participants
 }: {
     level: string;
     event_id: number;
     categories: string[];
-    headCells: any[];
     gender: 'F' | 'M';
     participants: Participant[]
 }) {
@@ -98,6 +97,154 @@ export function TabsComponent({
         if (action === 'EDIT') setNotes(formData.notes);
     }, [action])
 
+    const headCells = [
+        {
+            id: 'id',
+            numeric: false,
+            disablePadding: true,
+            label: '#',
+            sorter: (row: EventParticipant) => row.id,
+            accessor: 'id'
+        },
+        {
+            id: 'participant',
+            numeric: false,
+            disablePadding: true,
+            label: 'Nombre',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: (row: EventParticipant & { participant: Participant }) => `${row.participant.first_name} ${row.participant.last_name}`
+        },
+        {
+            id: 'participant_institution_name',
+            numeric: false,
+            disablePadding: true,
+            label: 'Gym / Esc.',
+            sorter: (row: EventParticipant) => row.participant_institution_name,
+            accessor: 'participant_institution_name'
+        },
+        {
+            id: 'salto',
+            numeric: false,
+            disablePadding: true,
+            label: 'Salto',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: (row: EventParticipant) => (
+                <Button type="button" variant="contained" size="small" onClick={() => {
+                    setFormData(row)
+                    setAction('EDIT')
+                }}>
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        },
+        {
+            id: 'paralelas',
+            numeric: false,
+            disablePadding: true,
+            label: 'Paralelas',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: (row: EventParticipant) => (
+                <Button type="button" variant="contained" size="small" onClick={() => {
+                    setFormData(row)
+                    setAction('EDIT')
+                }}>
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        },
+        {
+            id: 'suelo',
+            numeric: false,
+            disablePadding: true,
+            label: 'Suelo',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: (row: EventParticipant) => (
+                <Button type="button" variant="contained" size="small" onClick={() => {
+                    setFormData(row)
+                    setAction('EDIT')
+                }}>
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        }
+    ]
+
+    const headCellsGaf = useMemo(() => [
+        ...headCells,
+        {
+            id: 'viga',
+            numeric: false,
+            disablePadding: true,
+            label: 'Viga',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: (row: EventParticipant) => (
+                <Button type="button" variant="contained" size="small" onClick={() => {
+                    setFormData(row)
+                    setAction('EDIT')
+                }}>
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        },
+        {
+            id: 'penalization',
+            numeric: false,
+            disablePadding: true,
+            label: 'Penalización',
+            sorter: (row: EventParticipant & { notes: { penalization: string } }) => row.notes.penalization,
+            accessor: (row: EventParticipant & { notes: { penalization: string } }) => row.notes.penalization
+        }
+    ], []);
+
+    const headCellsGam = useMemo(() => [
+        ...headCells,
+        {
+            id: 'barra_fija',
+            numeric: false,
+            disablePadding: true,
+            label: 'Barra Fija',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: (row: EventParticipant) => (
+                <Button type="button" variant="contained" size="small" onClick={() => {
+                    setFormData(row)
+                    setAction('EDIT')
+                }}>
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        },
+        {
+            id: 'arzones',
+            numeric: false,
+            disablePadding: true,
+            label: 'Arzones',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: (row: EventParticipant) => (
+                <Button type="button" variant="contained" size="small" onClick={() => {
+                    setFormData(row)
+                    setAction('EDIT')
+                }}>
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        },
+        {
+            id: 'anillas',
+            numeric: false,
+            disablePadding: true,
+            label: 'Anillas',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: (row: EventParticipant) => (
+                <Button type="button" variant="contained" size="small" onClick={() => {
+                    setFormData(row)
+                    setAction('EDIT')
+                }}>
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        }
+    ], []);
+
     const handleChangeTab = (_event: React.SyntheticEvent, newValue: number) => setValue(newValue);
 
     const handleClose = () => {
@@ -119,13 +266,12 @@ export function TabsComponent({
                 return (
                     <CustomTabPanel key={idx} value={value} index={idx}>
                         <DataGrid
-                            headCells={headCells}
+                            headCells={gender === 'F' ? headCellsGaf : headCellsGam}
                             rows={eventParticipants.filter(ep => allowedIds.includes(ep.participant_id))}
                             setAction={setAction}
                             setData={setFormData}
                             defaultOrderBy='total'
                             showPlayAction={() => setShowScore(true)}
-                            showEditAction
                             showDeleteAction
                             contentHeader={
                                 <Box sx={{ display: 'flex', justifyContent: 'end', p: 1, pb: 0 }}>

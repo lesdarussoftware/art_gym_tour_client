@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useContext, useMemo, useState } from "react";
-import EditIcon from '@mui/icons-material/Edit';
+import { useContext, useState } from "react";
 
 import { MessageContext } from "../providers/MessageProvider";
+import { EventParticipantContext } from "../providers/EventParticipantProvider";
 
 import { useQuery } from "./useQuery";
 
-import { Participant, EventParticipant, NoteGaf, NoteGam } from "../helpers/types";
-import { getTotalGaf, getTotalGam } from "../helpers/utils";
+import { NoteGaf, NoteGam } from "../helpers/types";
 import { NOTE_GAF__URL, NOTE_GAM_URL, EVENT_PARTICIPANT_URL } from "../helpers/urls";
 import { STATUS_CODES } from "../helpers/constants";
-import { EventParticipantContext } from "../providers/EventParticipantProvider";
-import { Button } from "@mui/material";
 
 export function useEventParticipants() {
 
@@ -200,139 +197,10 @@ export function useEventParticipants() {
         setOpenMessage(true);
     }
 
-    const headCells = [
-        {
-            id: 'id',
-            numeric: false,
-            disablePadding: true,
-            label: '#',
-            sorter: (row: EventParticipant) => row.id,
-            accessor: 'id'
-        },
-        {
-            id: 'participant',
-            numeric: false,
-            disablePadding: true,
-            label: 'Nombre',
-            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
-            accessor: (row: EventParticipant & { participant: Participant }) => `${row.participant.first_name} ${row.participant.last_name}`
-        },
-        {
-            id: 'participant_institution_name',
-            numeric: false,
-            disablePadding: true,
-            label: 'Gym / Esc.',
-            sorter: (row: EventParticipant) => row.participant_institution_name,
-            accessor: 'participant_institution_name'
-        },
-        {
-            id: 'salto',
-            numeric: false,
-            disablePadding: true,
-            label: 'Salto',
-            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
-            accessor: () => (
-                <Button type="button" variant="contained" size="small">
-                    <EditIcon sx={{ color: '#FFF' }} />
-                </Button>
-            )
-        },
-        {
-            id: 'paralelas',
-            numeric: false,
-            disablePadding: true,
-            label: 'Paralelas',
-            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
-            accessor: () => (
-                <Button type="button" variant="contained" size="small">
-                    <EditIcon sx={{ color: '#FFF' }} />
-                </Button>
-            )
-        },
-        {
-            id: 'suelo',
-            numeric: false,
-            disablePadding: true,
-            label: 'Suelo',
-            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
-            accessor: () => (
-                <Button type="button" variant="contained" size="small">
-                    <EditIcon sx={{ color: '#FFF' }} />
-                </Button>
-            )
-        }
-    ]
-
-    const headCellsGaf = useMemo(() => [
-        ...headCells,
-        {
-            id: 'viga',
-            numeric: false,
-            disablePadding: true,
-            label: 'Viga',
-            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
-            accessor: () => (
-                <Button type="button" variant="contained" size="small">
-                    <EditIcon sx={{ color: '#FFF' }} />
-                </Button>
-            )
-        },
-        {
-            id: 'penalization',
-            numeric: false,
-            disablePadding: true,
-            label: 'Penalización',
-            sorter: (row: EventParticipant & { notes: { penalization: string } }) => row.notes.penalization,
-            accessor: (row: EventParticipant & { notes: { penalization: string } }) => row.notes.penalization
-        }
-    ], []);
-
-    const headCellsGam = useMemo(() => [
-        ...headCells,
-        {
-            id: 'barra_fija',
-            numeric: false,
-            disablePadding: true,
-            label: 'Barra Fija',
-            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
-            accessor: () => (
-                <Button type="button" variant="contained" size="small">
-                    <EditIcon sx={{ color: '#FFF' }} />
-                </Button>
-            )
-        },
-        {
-            id: 'arzones',
-            numeric: false,
-            disablePadding: true,
-            label: 'Arzones',
-            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
-            accessor: () => (
-                <Button type="button" variant="contained" size="small">
-                    <EditIcon sx={{ color: '#FFF' }} />
-                </Button>
-            )
-        },
-        {
-            id: 'anillas',
-            numeric: false,
-            disablePadding: true,
-            label: 'Anillas',
-            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
-            accessor: () => (
-                <Button type="button" variant="contained" size="small">
-                    <EditIcon sx={{ color: '#FFF' }} />
-                </Button>
-            )
-        }
-    ], []);
-
     return {
         getEventParticipants,
         action,
         setAction,
-        headCellsGaf,
-        headCellsGam,
         handleSubmit,
         destroy,
         updateNotes

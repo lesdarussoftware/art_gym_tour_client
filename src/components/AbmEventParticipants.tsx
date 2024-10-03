@@ -134,7 +134,8 @@ export function AbmEventParticipants({
                 </FormControl>
                 {action === 'EDIT' &&
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                        <FormControl>
+                        {gender}
+                        {/* <FormControl>
                             <TextField
                                 label="Nota Salto"
                                 type="number"
@@ -280,7 +281,7 @@ export function AbmEventParticipants({
                                     />
                                 </FormControl>
                             </>
-                        }
+                        } */}
                     </Box>
                 }
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 1 }}>
