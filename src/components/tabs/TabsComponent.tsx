@@ -14,7 +14,7 @@ import { AbmEventParticipants } from '../AbmEventParticipants';
 import { ScorePresentation } from '../ScorePresentation';
 
 import { a11yProps, getAllowedParticipants } from '../../helpers/utils';
-import { Participant } from '../../helpers/types';
+import { EventParticipant, Participant } from '../../helpers/types';
 
 export function TabsComponent({
     level,
@@ -114,18 +114,13 @@ export function TabsComponent({
                 </Tabs>
             </Box>
             {categories.map((cat, idx) => {
-                const allowed = getAllowedParticipants(participants, gender, level, cat);
-                const allowedIds = allowed.map((a: { id: any; }) => a.id)
+                const allowedParticipants = getAllowedParticipants(participants, gender, level, cat);
+                const allowedIds = allowedParticipants.map((a: { id: any; }) => a.id)
                 return (
                     <CustomTabPanel key={idx} value={value} index={idx}>
                         <DataGrid
                             headCells={headCells}
-                            rows={eventParticipants.filter(ep => {
-                                return ep.category === cat &&
-                                    ep.participant_level === level &&
-                                    ep.participant_id &&
-                                    allowedIds.includes(ep.participant_id)
-                            })}
+                            rows={eventParticipants.filter(ep => allowedIds.includes(ep.participant_id))}
                             setAction={setAction}
                             setData={setFormData}
                             defaultOrderBy='total'

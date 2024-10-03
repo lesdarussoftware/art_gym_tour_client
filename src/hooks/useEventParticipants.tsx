@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useMemo, useState } from "react";
+import EditIcon from '@mui/icons-material/Edit';
 
 import { MessageContext } from "../providers/MessageProvider";
 
@@ -10,6 +11,7 @@ import { getTotalGaf, getTotalGam } from "../helpers/utils";
 import { NOTE_GAF__URL, NOTE_GAM_URL, EVENT_PARTICIPANT_URL } from "../helpers/urls";
 import { STATUS_CODES } from "../helpers/constants";
 import { EventParticipantContext } from "../providers/EventParticipantProvider";
+import { Button } from "@mui/material";
 
 export function useEventParticipants() {
 
@@ -208,11 +210,11 @@ export function useEventParticipants() {
             accessor: 'id'
         },
         {
-            id: 'participant_id',
+            id: 'participant',
             numeric: false,
             disablePadding: true,
             label: 'Nombre',
-            sorter: (row: EventParticipant & { participant: Participant }) => `${row.participant.first_name} ${row.participant.last_name}`,
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
             accessor: (row: EventParticipant & { participant: Participant }) => `${row.participant.first_name} ${row.participant.last_name}`
         },
         {
@@ -223,143 +225,105 @@ export function useEventParticipants() {
             sorter: (row: EventParticipant) => row.participant_institution_name,
             accessor: 'participant_institution_name'
         },
+        {
+            id: 'salto',
+            numeric: false,
+            disablePadding: true,
+            label: 'Salto',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: () => (
+                <Button type="button" variant="contained" size="small">
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        },
+        {
+            id: 'paralelas',
+            numeric: false,
+            disablePadding: true,
+            label: 'Paralelas',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: () => (
+                <Button type="button" variant="contained" size="small">
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        },
+        {
+            id: 'suelo',
+            numeric: false,
+            disablePadding: true,
+            label: 'Suelo',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: () => (
+                <Button type="button" variant="contained" size="small">
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
+        }
     ]
 
     const headCellsGaf = useMemo(() => [
         ...headCells,
         {
-            id: 'salto_note',
-            numeric: false,
-            disablePadding: true,
-            label: 'Salto',
-            sorter: (row: EventParticipant & { notes: { salto_note: string } }) => row.notes.salto_note,
-            accessor: (row: EventParticipant & { notes: { salto_note: string } }) => row.notes.salto_note
-        },
-        {
-            id: 'paralelas_note',
-            numeric: false,
-            disablePadding: true,
-            label: 'Paral.',
-            sorter: (row: EventParticipant & { notes: { paralelas_note: string } }) => row.notes.paralelas_note,
-            accessor: (row: EventParticipant & { notes: { paralelas_note: string } }) => row.notes.paralelas_note
-        },
-        {
-            id: 'viga_note',
+            id: 'viga',
             numeric: false,
             disablePadding: true,
             label: 'Viga',
-            sorter: (row: EventParticipant & { notes: { viga_note: string } }) => row.notes.viga_note,
-            accessor: (row: EventParticipant & { notes: { viga_note: string } }) => row.notes.viga_note
-        },
-        {
-            id: 'suelo_note',
-            numeric: false,
-            disablePadding: true,
-            label: 'Suelo',
-            sorter: (row: EventParticipant & { notes: { suelo_note: string } }) => row.notes.suelo_note,
-            accessor: (row: EventParticipant & { notes: { suelo_note: string } }) => row.notes.suelo_note
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: () => (
+                <Button type="button" variant="contained" size="small">
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
         },
         {
             id: 'penalization',
             numeric: false,
             disablePadding: true,
-            label: 'Penal.',
+            label: 'Penalización',
             sorter: (row: EventParticipant & { notes: { penalization: string } }) => row.notes.penalization,
             accessor: (row: EventParticipant & { notes: { penalization: string } }) => row.notes.penalization
-        },
-        {
-            id: 'total',
-            numeric: false,
-            disablePadding: true,
-            label: 'Total',
-            sorter: (row: EventParticipant) => row.id,
-            accessor: (row: EventParticipant & {
-                notes: {
-                    suelo_note: string;
-                    salto_note: string;
-                    viga_note: string;
-                    paralelas_note: string;
-                    penalization: string;
-                }
-            }) => getTotalGaf(row.notes)
         }
     ], []);
 
     const headCellsGam = useMemo(() => [
         ...headCells,
         {
-            id: 'salto_note',
+            id: 'barra_fija',
             numeric: false,
             disablePadding: true,
-            label: 'Salto',
-            sorter: (row: EventParticipant & { notes: { salto_note: string } }) => row.notes.salto_note,
-            accessor: (row: EventParticipant & { notes: { salto_note: string } }) => row.notes.salto_note
+            label: 'Barra Fija',
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: () => (
+                <Button type="button" variant="contained" size="small">
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
         },
         {
-            id: 'paralelas_note',
-            numeric: false,
-            disablePadding: true,
-            label: 'Paral.',
-            sorter: (row: EventParticipant & { notes: { paralelas_note: string } }) => row.notes.paralelas_note,
-            accessor: (row: EventParticipant & { notes: { paralelas_note: string } }) => row.notes.paralelas_note
-        },
-        {
-            id: 'barra_fija_note',
-            numeric: false,
-            disablePadding: true,
-            label: 'B. fija',
-            sorter: (row: EventParticipant & { notes: { barra_fija_note: string } }) => row.notes.barra_fija_note,
-            accessor: (row: EventParticipant & { notes: { barra_fija_note: string } }) => row.notes.barra_fija_note
-        },
-        {
-            id: 'suelo_note',
-            numeric: false,
-            disablePadding: true,
-            label: 'Suelo',
-            sorter: (row: EventParticipant & { notes: { suelo_note: string } }) => row.notes.suelo_note,
-            accessor: (row: EventParticipant & { notes: { suelo_note: string } }) => row.notes.suelo_note
-        },
-        {
-            id: 'arzones_note',
+            id: 'arzones',
             numeric: false,
             disablePadding: true,
             label: 'Arzones',
-            sorter: (row: EventParticipant & { notes: { arzones_note: string } }) => row.notes.arzones_note,
-            accessor: (row: EventParticipant & { notes: { arzones_note: string } }) => row.notes.arzones_note
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: () => (
+                <Button type="button" variant="contained" size="small">
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
         },
         {
-            id: 'anillas_note',
+            id: 'anillas',
             numeric: false,
             disablePadding: true,
             label: 'Anillas',
-            sorter: (row: EventParticipant & { notes: { anillas_note: string } }) => row.notes.anillas_note,
-            accessor: (row: EventParticipant & { notes: { anillas_note: string } }) => row.notes.anillas_note
-        },
-        {
-            id: 'penalization',
-            numeric: false,
-            disablePadding: true,
-            label: 'Penal.',
-            sorter: (row: EventParticipant & { notes: { penalization: string } }) => row.notes.penalization,
-            accessor: (row: EventParticipant & { notes: { penalization: string } }) => row.notes.penalization
-        },
-        {
-            id: 'total',
-            numeric: false,
-            disablePadding: true,
-            label: 'Total',
-            sorter: (row: EventParticipant) => row.id,
-            accessor: (row: EventParticipant & {
-                notes: {
-                    suelo_note: string;
-                    salto_note: string;
-                    barra_fija_note: string;
-                    paralelas_note: string;
-                    arzones_note: string;
-                    anillas_note: string;
-                    penalization: string;
-                }
-            }) => getTotalGam(row.notes)
+            sorter: (row: EventParticipant & { participant: Participant }) => row.participant.first_name,
+            accessor: () => (
+                <Button type="button" variant="contained" size="small">
+                    <EditIcon sx={{ color: '#FFF' }} />
+                </Button>
+            )
         }
     ], []);
 

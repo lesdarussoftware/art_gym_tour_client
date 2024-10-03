@@ -21,7 +21,14 @@ import { getComparator, stableSort } from '../../helpers/utils';
 type DataGridProps = {
     children?: ReactNode,
     contentHeader?: ReactNode,
-    headCells: Array<{ id: string; label: string; disableSort?: boolean; render?: (rowData: any) => ReactNode, sorter: any }>,
+    headCells: Array<{
+        id: string;
+        numeric: boolean;
+        disablePadding: boolean;
+        label: string;
+        sorter?: any;
+        accessor: string | ((rowData: any) => ReactNode);
+    }>,
     rows: Array<any>,
     setAction?: React.Dispatch<React.SetStateAction<"EDIT" | "NEW" | "DELETE" | null>>,
     setData?: (data: Array<any>) => void,
@@ -172,6 +179,7 @@ export function DataGrid({
                                                         <TableCell
                                                             key={idx}
                                                             align="left"
+                                                            sx={{ p: 0 }}
                                                         >
                                                             {typeof accessor === "function"
                                                                 ? accessor(row, index)
